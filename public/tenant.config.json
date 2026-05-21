@@ -1,0 +1,34 @@
+{
+  "_note": "This file is overwritten by the Apotome provisioning service during site generation. Edit your live content from /admin.",
+  "archetype": "keystone",
+  "brand": "Keystone Services",
+  "tagline": "Expert Service, Local Trust",
+  "blurb": "Professional services built on decades of community relationships.",
+  "theme": "earth",
+  "swatch": "default",
+  "variant": "classic",
+  "contact": {
+    "address": "100 Commercial St, Trinidad, CO 81082",
+    "phone": "(719) 555-0400",
+    "email": "info@example.com",
+    "mapEmbedUrl": ""
+  },
+  "hours": [
+    { "day": "Mon–Fri", "open": "8am – 5pm" },
+    { "day": "Saturday", "open": "9am – 2pm" },
+    { "day": "Sunday", "open": "Closed" }
+  ],
+  "photos": {
+    "hero": { "src": "/images/hero.jpg", "alt": "Business exterior" },
+    "about": { "src": "/images/about.jpg", "alt": "Team at work" },
+    "gallery": []
+  },
+  "story": {
+    "title": "Our Story",
+    "paragraphs": ["Serving our community with expertise and integrity."],
+    "facts": []
+  },
+  "services": [],
+  "testimonials": [],
+  "social": []
+}
