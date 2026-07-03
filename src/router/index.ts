@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { PLATFORM_ENABLED } from '../platform/config'
-import { adminRoutes } from '../admin/routes'
+import { PLATFORM_ENABLED } from '@apotome/archetype-shared/platform/config'
+import { adminRoutes } from '@apotome/archetype-shared/admin/routes'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
