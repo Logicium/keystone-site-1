@@ -1,13 +1,22 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { siteConfig } from '../config/site.config'
-import HeroSection from '../components/sections/HeroSection.vue'
+import { useSiteContentStore } from '@apotome/archetype-shared/platform/siteContentStore'
+import HeroSection from '@apotome/archetype-shared/components/sections/HeroSection.vue'
 import DispatchBar from '../components/sections/DispatchBar.vue'
 import ServicesSection from '../components/sections/ServicesSection.vue'
 import CapabilitiesSection from '../components/sections/CapabilitiesSection.vue'
-import AboutSection from '../components/sections/AboutSection.vue'
+import AboutSection from '@apotome/archetype-shared/components/sections/AboutSection.vue'
 import ProjectsSection from '../components/sections/ProjectsSection.vue'
-import HoursSection from '../components/sections/HoursSection.vue'
-import TestimonialsSection from '../components/sections/TestimonialsSection.vue'
+import HoursSection from '@apotome/archetype-shared/components/sections/HoursSection.vue'
+import TestimonialsSection from '@apotome/archetype-shared/components/sections/TestimonialsSection.vue'
+
+const content = useSiteContentStore()
+const reviewItems = computed(() =>
+  content.reviewsSource === 'google' && content.googleReviews.length
+    ? content.googleReviews
+    : siteConfig.testimonials,
+)
 </script>
 
 <template>
@@ -70,6 +79,6 @@ import TestimonialsSection from '../components/sections/TestimonialsSection.vue'
   <TestimonialsSection
     eyebrow="Word from the lot"
     title="What customers say"
-    :items="siteConfig.testimonials"
+    :items="reviewItems"
   />
 </template>
