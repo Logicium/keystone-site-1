@@ -2,19 +2,20 @@
 import { onMounted } from 'vue'
 import { RouterView } from 'vue-router'
 import { siteConfig } from './config/site.config'
-import { useSiteTheme } from './composables/useSiteTheme'
-import { useImagePreload } from './composables/useImagePreload'
-import { useApScrollbar } from './composables/useApScrollbar'
-import AppHeader from './components/layout/AppHeader.vue'
-import AppFooter from './components/layout/AppFooter.vue'
-import AppLoader from './components/AppLoader.vue'
-import ThemeSwitcher from './components/ThemeSwitcher.vue'
+import { useSiteTheme } from '@apotome/archetype-shared/composables/useSiteTheme'
+import { useImagePreload } from '@apotome/archetype-shared/composables/useImagePreload'
+import { useApScrollbar } from '@apotome/archetype-shared/composables/useApScrollbar'
+import { usePreferences } from '@apotome/archetype-shared/composables/usePreferences'
+import AppHeader from '@apotome/archetype-shared/components/layout/AppHeader.vue'
+import AppFooter from '@apotome/archetype-shared/components/layout/AppFooter.vue'
+import AppLoader from '@apotome/archetype-shared/components/AppLoader.vue'
+import ThemeSwitcher from '@apotome/archetype-shared/components/ThemeSwitcher.vue'
 
-const { init } = useSiteTheme()
-const { isReady, preloadCritical } = useImagePreload()
+const { initFromConfig } = useSiteTheme()
+const { isReady, progress, loaded, total, label, preloadCritical } = useImagePreload()
 
 onMounted(async () => {
-  init(siteConfig.theme, siteConfig.swatch, siteConfig.variant, 'utility')
+  initFromConfig(siteConfig, 'utility')
   useApScrollbar()
   await preloadCritical([
     siteConfig.photos.hero.src,
@@ -23,7 +24,7 @@ onMounted(async () => {
   ])
 })
 
-const showSwitcher = import.meta.env.DEV
+const showSwitcher = usePreferences().themePickerVisible
 
 const navLinks = [
   { to: '/', label: 'Home' },
@@ -34,7 +35,7 @@ const navLinks = [
 </script>
 
 <template>
-  <AppLoader :brand="siteConfig.brand" :visible="!isReady" />
+  <AppLoader :brand="siteConfig.brand" :visible="!isReady" :progress="progress" :loaded="loaded" :total="total" :label="label" />
   <AppHeader
     :brand="siteConfig.brand"
     :tagline="siteConfig.tagline"
