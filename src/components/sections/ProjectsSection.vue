@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import OptimizedImage from '@/components/OptimizedImage.vue'
+import OptimizedImage from '@apotome/archetype-shared/components/OptimizedImage.vue'
 
 interface ProjectEntry {
   title: string
