@@ -1,9 +1,15 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { siteConfig } from '../config/site.config'
-import HeroSection from '../components/sections/HeroSection.vue'
+import HeroSection from '@apotome/archetype-shared/components/sections/HeroSection.vue'
 import ContactSection from '../components/sections/ContactSection.vue'
 import DispatchBar from '../components/sections/DispatchBar.vue'
-import HoursSection from '../components/sections/HoursSection.vue'
+import HoursSection from '@apotome/archetype-shared/components/sections/HoursSection.vue'
+import BookingSection from '@apotome/archetype-shared/components/sections/BookingSection.vue'
+import { useSiteContentStore } from '@apotome/archetype-shared/platform/siteContentStore'
+
+const store = useSiteContentStore()
+const showBooking = computed(() => store.hasAddOn('appointments'))
 </script>
 
 <template>
@@ -20,6 +26,13 @@ import HoursSection from '../components/sections/HoursSection.vue'
     :emergency="siteConfig.dispatch.emergency"
     :emergency-phone="siteConfig.dispatch.emergencyPhone"
     :service-area="siteConfig.dispatch.serviceArea"
+  />
+
+  <BookingSection
+    v-if="showBooking"
+    eyebrow="Book a service"
+    title="Schedule an appointment online"
+    intro="Pick a service and a time that works for you — we'll send a confirmation right away."
   />
 
   <ContactSection
