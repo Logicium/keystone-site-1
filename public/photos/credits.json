@@ -1,0 +1,103 @@
+{
+  "template": "keystone",
+  "license": "Unsplash License",
+  "generatedAt": "2026-07-01T03:08:27.212Z",
+  "photos": [
+    {
+      "file": "hero.jpg",
+      "photographer": "Tahamie Farooqui",
+      "photographerUrl": "https://unsplash.com/@tami171091?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/a-tire-with-a-wrench-next-to-it-IU-mLTtrJgo?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "IU-mLTtrJgo",
+      "alt": "Shop bay at first light"
+    },
+    {
+      "file": "about.jpg",
+      "photographer": "Wolfgang Vrede",
+      "photographerUrl": "https://unsplash.com/@wvrede?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/mechanics-working-on-an-orange-race-car-in-a-garage-u8Vr8qC4BR0?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "u8Vr8qC4BR0",
+      "alt": "The crew on the floor"
+    },
+    {
+      "file": "gallery-diesel.jpg",
+      "photographer": "Michal Kučera",
+      "photographerUrl": "https://unsplash.com/@m_kucera_12?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/close-up-of-a-detroit-diesel-engine-UxSjzLtAKlY?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "UxSjzLtAKlY",
+      "alt": "Diesel rebuild on the lift"
+    },
+    {
+      "file": "gallery-fab.jpg",
+      "photographer": "Zoshua Colah",
+      "photographerUrl": "https://unsplash.com/@zoshuacolah?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/industrial-lathe-machine-with-metal-shavings-Q5swzOgCkgo?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "Q5swzOgCkgo",
+      "alt": "Custom trailer fabrication"
+    },
+    {
+      "file": "gallery-weld.jpg",
+      "photographer": "Christopher Burns",
+      "photographerUrl": "https://unsplash.com/@christopher__burns?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/man-using-welding-machine-Wiu3w-99tNg?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "Wiu3w-99tNg",
+      "alt": "Structural weld, in progress"
+    },
+    {
+      "file": "gallery-truck.jpg",
+      "photographer": "Evan Middleton",
+      "photographerUrl": "https://unsplash.com/@emiddlephoto?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/brown-crew-cab-pickup-truck-on-road-during-daytime-HVoco6yUXCU?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "HVoco6yUXCU",
+      "alt": "Field service truck loaded out"
+    },
+    {
+      "file": "gallery-build.jpg",
+      "photographer": "D R",
+      "photographerUrl": "https://unsplash.com/@dkphotos22?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/black-metal-canopy-frame-dSRhwPe6v9c?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "dSRhwPe6v9c",
+      "alt": "Commercial build-out framing"
+    },
+    {
+      "file": "gallery-tools.jpg",
+      "photographer": "Jakub Żerdzicki",
+      "photographerUrl": "https://unsplash.com/@jakubzerdzicki?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/tools-of-various-kinds-hang-on-the-wall-VrF2AnqWZlo?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "VrF2AnqWZlo",
+      "alt": "Tool wall, end of day"
+    },
+    {
+      "file": "project-fleet.jpg",
+      "photographer": "Zetong Li",
+      "photographerUrl": "https://unsplash.com/@zetong?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/white-and-blue-truck-on-road-during-daytime-mVqTumQH-c0?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "mVqTumQH-c0",
+      "alt": "Class-8 fleet PM contract"
+    },
+    {
+      "file": "project-trailer.jpg",
+      "photographer": "Zanelle Lofty-Eaton",
+      "photographerUrl": "https://unsplash.com/@zanellelofty?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/a-truck-is-being-towed-on-a-flatbed-trailer-jEPQKAijobQ?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "jEPQKAijobQ",
+      "alt": "Gooseneck stock trailer"
+    },
+    {
+      "file": "project-ag.jpg",
+      "photographer": "Micah Tindell",
+      "photographerUrl": "https://unsplash.com/@micahtindell?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/green-and-brown-tractor-P74xgJ02Fs0?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "P74xgJ02Fs0",
+      "alt": "Ag implement re-build"
+    },
+    {
+      "file": "project-ti.jpg",
+      "photographer": "New York Suburban Homes",
+      "photographerUrl": "https://unsplash.com/@nysuburbanhomes?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/a-building-with-a-sign-on-it-pbTEZoCt3wQ?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "pbTEZoCt3wQ",
+      "alt": "Main-street shop tenant improvement"
+    }
+  ]
+}
