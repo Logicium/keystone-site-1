@@ -1,4 +1,4 @@
-import type { ThemeName, SwatchName, SiteVariant } from '../themes/tokens'
+import type { ThemeName, SwatchName, SiteVariant } from '@apotome/archetype-shared/themes/tokens'
 
 /** Photo manifest entry; `slot` matches a key in `photos.*` below. */
 export interface PhotoSlot { src: string; alt?: string; caption?: string }
@@ -96,7 +96,9 @@ export interface KeystoneSiteConfig {
  * Demo configuration for a utility / skilled-trades business.
  * Swap `theme` / `swatch` to re-skin. Edit content here only.
  */
-export const siteConfig: KeystoneSiteConfig = {
+import { reactive } from 'vue'
+
+export const siteConfig: KeystoneSiteConfig = reactive(({
   brand: 'Keystone Works',
   tagline: 'Auto · Welding · Build',
   blurb:
@@ -122,15 +124,15 @@ export const siteConfig: KeystoneSiteConfig = {
     { day: 'Sunday',          open: 'Emergency only' },
   ],
   photos: {
-    hero:  { src: '/showcase/hero.jpg',   alt: 'Shop bay at first light' },
-    about: { src: '/showcase/mesa.jpg',   alt: 'Crew on the floor' },
+    hero:  { src: '/photos/hero.jpg',  alt: 'Shop bay at first light' },
+    about: { src: '/photos/about.jpg', alt: 'The crew on the floor' },
     gallery: [
-      { src: '/showcase/hero.jpg',   alt: 'Diesel rebuild on the lift' },
-      { src: '/showcase/mesa.jpg',   alt: 'Custom trailer fabrication' },
-      { src: '/showcase/vault.jpg',  alt: 'Structural weld, in progress' },
-      { src: '/showcase/hearth.jpg', alt: 'Field service truck loaded out' },
-      { src: '/showcase/hero.jpg',   alt: 'Commercial build-out framing' },
-      { src: '/showcase/mesa.jpg',   alt: 'Tool wall, end of day' },
+      { src: '/photos/gallery-diesel.jpg', alt: 'Diesel rebuild on the lift' },
+      { src: '/photos/gallery-fab.jpg',    alt: 'Custom trailer fabrication' },
+      { src: '/photos/gallery-weld.jpg',   alt: 'Structural weld, in progress' },
+      { src: '/photos/gallery-truck.jpg',  alt: 'Field service truck loaded out' },
+      { src: '/photos/gallery-build.jpg',  alt: 'Commercial build-out framing' },
+      { src: '/photos/gallery-tools.jpg',  alt: 'Tool wall, end of day' },
     ],
   },
   story: {
@@ -199,28 +201,28 @@ export const siteConfig: KeystoneSiteConfig = {
         title: 'Class-8 fleet PM contract',
         category: 'Auto & Diesel',
         blurb: 'Monthly preventive-maintenance program for a 22-truck regional hauler.',
-        image: '/showcase/hero.jpg',
+        image: '/photos/project-fleet.jpg',
         meta: ['22 trucks', 'Active'],
       },
       {
         title: 'Gooseneck stock trailer',
         category: 'Welding & Fabrication',
         blurb: 'Built-from-frame 24ft gooseneck, DOT lights and brakes, full bed-liner.',
-        image: '/showcase/mesa.jpg',
+        image: '/photos/project-trailer.jpg',
         meta: ['3 weeks', 'Custom'],
       },
       {
         title: 'Ag implement re-build',
         category: 'Welding & Fabrication',
         blurb: 'Structural repair on a 1990s baler frame. Stamped, returned to service.',
-        image: '/showcase/vault.jpg',
+        image: '/photos/project-ag.jpg',
         meta: ['1 week', 'Certified'],
       },
       {
         title: 'Main-street shop T.I.',
         category: 'Build & Contract',
         blurb: 'Light commercial tenant-improvement, including code close-out.',
-        image: '/showcase/hearth.jpg',
+        image: '/photos/project-ti.jpg',
         meta: ['8 weeks', 'Commercial'],
       },
     ],
@@ -234,4 +236,4 @@ export const siteConfig: KeystoneSiteConfig = {
     { label: 'Facebook', href: 'https://facebook.com' },
     { label: 'Google',   href: 'https://google.com' },
   ],
-}
+}))
