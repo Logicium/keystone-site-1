@@ -34,6 +34,12 @@ export function applyDeep(target: Record<string, unknown>, source: unknown): voi
     const cur = target[k]
     if (v && typeof v === 'object' && !Array.isArray(v) && cur && typeof cur === 'object' && !Array.isArray(cur)) {
       applyDeep(cur as Record<string, unknown>, v)
+    } else if (v && typeof v === 'object' && !Array.isArray(v) && Array.isArray(cur)) {
+      // Shape mismatch: the overlay has a plain object where the template
+      // expects an array (seen with legacy admin payloads, e.g. rooms as
+      // `{intro, items}`). Clobbering the array crashes template code that
+      // maps over it — keep the build-time array and skip the bad branch.
+      console.warn(`[content] ignoring overlay for "${k}": expected array, got object`)
     } else {
       target[k] = v
     }
@@ -49,6 +55,11 @@ export const useSiteContentStore = defineStore('siteContent', () => {
   // Live Google reviews, mapped to the TestimonialsSection shape.
   const googleReviews = ref<Array<{ quote: string; author: string; source?: string; rating?: number }>>([])
   const googleReviewsLoaded = ref(false)
+
+  // Live Instagram feed, mapped to the GallerySection photo shape. When the
+  // owner has connected Instagram, this replaces the build-time gallery.
+  const instagramMedia = ref<Array<{ id: string; src: string; permalink: string; caption?: string }>>([])
+  let instagramLookup: Promise<void> | null = null
 
   // Cached id of the site whose slug matches PLATFORM_SITE_KEY — needed to call
   // the owner-scoped admin endpoints from the public site.
@@ -93,6 +104,25 @@ export const useSiteContentStore = defineStore('siteContent', () => {
         }))
       googleReviewsLoaded.value = true
     } catch { /* ignore — testimonials remain the fallback */ }
+  }
+
+  /** Fetch the connected Instagram feed once; no-op on static/demo builds.
+      Safe to call from every GallerySection — concurrent calls coalesce. */
+  function loadInstagram(): Promise<void> {
+    if (!isPlatform.value) return Promise.resolve()
+    if (!instagramLookup) {
+      instagramLookup = contentClient.fetchInstagram()
+        .then(res => {
+          instagramMedia.value = res.media.map(m => ({
+            id: m.id,
+            src: m.media_url,
+            permalink: m.permalink,
+            caption: m.caption,
+          }))
+        })
+        .catch(() => { /* stock gallery remains the fallback */ })
+    }
+    return instagramLookup
   }
 
   async function hydrate() {
@@ -188,6 +218,7 @@ export const useSiteContentStore = defineStore('siteContent', () => {
   return {
     config, hydrated, hydrating, error, isPlatform,
     reviewsSource, googleReviews,
+    instagramMedia, loadInstagram,
     ownedSiteId,
     addOns, hasAddOn,
     hydrate, setBuildTimeConfig, loadGoogleReviews,
