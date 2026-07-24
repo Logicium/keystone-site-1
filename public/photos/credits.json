@@ -1,23 +1,23 @@
 {
   "template": "keystone",
   "license": "Unsplash License",
-  "generatedAt": "2026-07-01T03:08:27.212Z",
+  "generatedAt": "2026-07-24T02:46:35.781Z",
   "photos": [
     {
       "file": "hero.jpg",
-      "photographer": "Tahamie Farooqui",
-      "photographerUrl": "https://unsplash.com/@tami171091?utm_source=Apotome%20Archetypes&utm_medium=referral",
-      "photoUrl": "https://unsplash.com/photos/a-tire-with-a-wrench-next-to-it-IU-mLTtrJgo?utm_source=Apotome%20Archetypes&utm_medium=referral",
-      "unsplashId": "IU-mLTtrJgo",
-      "alt": "Shop bay at first light"
+      "photographer": "Josh Beech",
+      "photographerUrl": "https://unsplash.com/@ig_joshabeech?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/person-in-black-jacket-holding-brown-wooden-rolling-pin-tXJhAFVOHVk?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "tXJhAFVOHVk",
+      "alt": "Cutting steel on the shop floor"
     },
     {
       "file": "about.jpg",
-      "photographer": "Wolfgang Vrede",
-      "photographerUrl": "https://unsplash.com/@wvrede?utm_source=Apotome%20Archetypes&utm_medium=referral",
-      "photoUrl": "https://unsplash.com/photos/mechanics-working-on-an-orange-race-car-in-a-garage-u8Vr8qC4BR0?utm_source=Apotome%20Archetypes&utm_medium=referral",
-      "unsplashId": "u8Vr8qC4BR0",
-      "alt": "The crew on the floor"
+      "photographer": "Tahamie Farooqui",
+      "photographerUrl": "https://unsplash.com/@tami171091?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/a-man-working-on-a-car-under-a-vehicle-K5624F8cipE?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "K5624F8cipE",
+      "alt": "Under the lift, mid-repair"
     },
     {
       "file": "gallery-diesel.jpg",
