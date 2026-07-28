@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { siteConfig } from '../config/site.config'
+import { variantAtLeast } from '@apotome/archetype-shared/themes/tokens'
 import { useSiteContentStore } from '@apotome/archetype-shared/platform/siteContentStore'
+import { useSiteTheme } from '@apotome/archetype-shared/composables/useSiteTheme'
 import HeroSection from '@apotome/archetype-shared/components/sections/HeroSection.vue'
 import DispatchBar from '../components/sections/DispatchBar.vue'
 import ServicesSection from '../components/sections/ServicesSection.vue'
@@ -11,6 +13,8 @@ import ProjectsSection from '../components/sections/ProjectsSection.vue'
 import HoursSection from '@apotome/archetype-shared/components/sections/HoursSection.vue'
 import TestimonialsSection from '@apotome/archetype-shared/components/sections/TestimonialsSection.vue'
 
+const { variant: liveVariant } = useSiteTheme()
+const isPortfolio = computed(() => variantAtLeast(liveVariant.value, 'portfolio'))
 const content = useSiteContentStore()
 const reviewItems = computed(() =>
   content.reviewsSource === 'google' && content.googleReviews.length
@@ -26,6 +30,7 @@ const reviewItems = computed(() =>
     :subtitle="siteConfig.blurb"
     :image="siteConfig.photos.hero.src"
     :image-alt="siteConfig.photos.hero.alt"
+    :images="isPortfolio ? [siteConfig.photos.hero, ...siteConfig.photos.gallery.slice(0, 3)] : []"
     :cta-primary="{ label: 'See services', to: '/services' }"
     :cta-secondary="{ label: 'Get a quote', to: '/contact' }"
     layout="split"

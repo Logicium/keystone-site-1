@@ -104,7 +104,7 @@ export const siteConfig: KeystoneSiteConfig = reactive(({
   blurb:
     'A working shop in Trinidad, Colorado. Diesel and gas diagnostics, structural welding, and small-commercial build-outs — done by hand, signed by name.',
   theme: 'ironwood',
-  swatch: 'stone',
+  swatch: 'ultramarine-light',
   variant: 'essentials',
   contact: {
     address: '1420 Industrial Way, Trinidad, CO 81082',

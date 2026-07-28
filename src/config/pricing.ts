@@ -20,8 +20,8 @@ export const PRICING: PriceItem[] = [
     category: 'website',
     featured: true,
     includes: [
-      'Choice of three design themes (Studio, Heritage, Vibrant)',
-      'Choice of eight color swatches',
+      'Choice of five design themes (Atlas, Studio, Heritage, Vibrant, Ironwood)',
+      'Eighteen color palettes, each in light and dark',
       'Hosted, fast, mobile-ready',
       '6–8 of your photos placed and captioned',
       'Hours, contact, and map embedded',
@@ -31,7 +31,7 @@ export const PRICING: PriceItem[] = [
     id: 'website-extended',
     name: 'Website (Portfolio)',
     price: 250,
-    blurb: 'The extended template with a dedicated gallery and 12–16 photos.',
+    blurb: 'The photo-forward site: hero carousel, dedicated gallery page, and up to 16 photos.',
     category: 'website',
     includes: [
       'Everything in Essentials',
