@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{
+withDefaults(defineProps<{
   eyebrow?: string
   title?: string
   intro?: string
@@ -8,7 +8,7 @@ defineProps<{
   email?: string
   mapEmbedUrl?: string
   formAction?: string
-}>()
+}>(), { title: 'Get in touch' })
 </script>
 
 <template>
@@ -17,7 +17,7 @@ defineProps<{
       <div>
         <div class="ap-section-head">
           <span v-if="eyebrow" class="ap-eyebrow">{{ eyebrow }}</span>
-          <h2>{{ title || 'Get in touch' }}</h2>
+          <h2>{{ title }}</h2>
           <p v-if="intro" style="color: var(--ap-ink-muted)">{{ intro }}</p>
         </div>
         <ul class="ap-contact__details">

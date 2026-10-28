@@ -9,13 +9,15 @@ import DispatchBar from '../components/sections/DispatchBar.vue'
 <template>
   <HeroSection
     subpage
-    eyebrow="Services & rates"
-    title="What we'll quote, and what we won't"
-    subtitle="Three trades under one roof. Flat-rate where we can, time-and-materials where we have to — always in writing before the wrench turns."
+    :eyebrow="siteConfig.sections.servicesPage.eyebrow"
+    :title="siteConfig.sections.servicesPage.title"
+    :subtitle="siteConfig.sections.servicesPage.subtitle"
     :image="siteConfig.photos.hero.src"
   />
 
   <DispatchBar
+    :label="siteConfig.sections.dispatch.label"
+    :emergency-label="siteConfig.sections.dispatch.emergencyLabel"
     :phone="siteConfig.dispatch.phone"
     :emergency="siteConfig.dispatch.emergency"
     :emergency-phone="siteConfig.dispatch.emergencyPhone"
@@ -29,8 +31,8 @@ import DispatchBar from '../components/sections/DispatchBar.vue'
   />
 
   <CapabilitiesSection
-    eyebrow="Spec sheet"
-    title="Equipped for the job"
+    :eyebrow="siteConfig.sections.servicesPage.capabilitiesEyebrow"
+    :title="siteConfig.sections.servicesPage.capabilitiesTitle"
     :intro="siteConfig.capabilities.intro"
     :items="siteConfig.capabilities.items"
   />

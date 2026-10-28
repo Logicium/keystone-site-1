@@ -90,6 +90,24 @@ export interface KeystoneSiteConfig {
   }
   testimonials: Array<{ quote: string; author: string; source?: string }>
   social: Array<{ label: string; href: string }>
+  /** Editable section headers (eyebrows / titles / notes / CTA labels) so
+   *  owners control every heading on the site, not just body copy. */
+  sections: {
+    nav: { home: string; services: string; work: string; contact: string; ctaLabel: string }
+    hero: { title: string; ctaPrimary: string; ctaSecondary: string }
+    dispatch: { label: string; emergencyLabel: string }
+    services: { eyebrow: string; title: string }
+    capabilities: { eyebrow: string; title: string }
+    story: { eyebrow: string }
+    projects: { eyebrow: string; title: string }
+    hours: { eyebrow: string; title: string; note: string }
+    reviews: { eyebrow: string; title: string }
+    servicesPage: { eyebrow: string; title: string; subtitle: string; capabilitiesEyebrow: string; capabilitiesTitle: string }
+    projectsPage: { eyebrow: string; title: string; subtitle: string; galleryEyebrow: string; galleryTitle: string }
+    contactPage: { eyebrow: string; title: string; subtitle: string; hoursEyebrow: string; hoursNote: string }
+    booking: { eyebrow: string; title: string; intro: string }
+    contact: { title: string; intro: string }
+  }
 }
 
 /**
@@ -102,10 +120,10 @@ export const siteConfig: KeystoneSiteConfig = reactive(({
   brand: 'Keystone Works',
   tagline: 'Auto · Welding · Build',
   blurb:
-    'A working shop in Trinidad, Colorado. Diesel and gas diagnostics, structural welding, and small-commercial build-outs — done by hand, signed by name.',
+    'Diesel and gas repair, structural welding, and small commercial build-outs from one shop on Industrial Way. Written quotes, real dates, and a crew that answers the phone.',
   theme: 'ironwood',
   swatch: 'ultramarine-light',
-  variant: 'essentials',
+  variant: 'portfolio',
   contact: {
     address: '1420 Industrial Way, Trinidad, CO 81082',
     phone: '(719) 555-0140',
@@ -116,7 +134,7 @@ export const siteConfig: KeystoneSiteConfig = reactive(({
     phone: '(719) 555-0140',
     emergency: true,
     emergencyPhone: '(719) 555-0199',
-    serviceArea: 'Trinidad, Walsenburg, Aguilar, Raton — 60 mile radius, on-site within 90 minutes.',
+    serviceArea: 'Trinidad, Walsenburg, Aguilar, Raton, 60 mile radius, on site within 90 minutes',
   },
   hours: [
     { day: 'Monday – Friday', open: '7:00 – 6:00' },
@@ -133,13 +151,23 @@ export const siteConfig: KeystoneSiteConfig = reactive(({
       { src: '/photos/gallery-truck.jpg',  alt: 'Field service truck loaded out' },
       { src: '/photos/gallery-build.jpg',  alt: 'Commercial build-out framing' },
       { src: '/photos/gallery-tools.jpg',  alt: 'Tool wall, end of day' },
+      { src: '/photos/gallery-07.jpg', alt: 'Engine bay teardown' },
+      { src: '/photos/gallery-08.jpg', alt: 'TIG bead on stainless' },
+      { src: '/photos/gallery-09.jpg', alt: 'Steel beam set on a build-out' },
+      { src: '/photos/gallery-10.jpg', alt: 'Fleet truck on the lift' },
+      { src: '/photos/gallery-11.jpg', alt: 'Plasma table cutting plate' },
+      { src: '/photos/gallery-12.jpg', alt: 'Bench, end of shift' },
+      { src: '/photos/gallery-13.jpg', alt: 'Hitch fabrication' },
+      { src: '/photos/gallery-14.jpg', alt: 'Diesel pickup after service' },
+      { src: '/photos/gallery-15.jpg', alt: 'Framing a commercial bay' },
+      { src: '/photos/gallery-16.jpg', alt: 'The shop floor at dawn' },
     ],
   },
   story: {
-    title: 'A shop built on the work, not the pitch.',
+    title: 'One bay, three trades, since 2011.',
     paragraphs: [
-      'Keystone Works opened in a former rail-yard machine shop with one rule: every job leaves better than we found it. We are a small crew of mechanics, welders, and builders who would rather show our hands than our brochure.',
-      'We work for ranchers, hauliers, small builders, and the people who keep Trinidad running. Bring us the job — we will tell you what it costs, when it will be done, and what we found while we were in there.',
+      'Keystone Works opened in a former rail-yard machine shop in 2011. Seven of us work the floor: mechanics, certified welders, and builders who have framed, plumbed, and closed out jobs across Las Animas County.',
+      'We work for ranchers, haulers, small builders, and fleet managers. Every job gets a written quote before work starts, a finish date you can plan around, and a straight report of anything else we found.',
     ],
     facts: [
       { label: 'Founded',  value: '2011' },
@@ -148,7 +176,7 @@ export const siteConfig: KeystoneSiteConfig = reactive(({
     ],
   },
   services: {
-    intro: 'Three trades under one roof. Flat-rate where we can, time-and-materials where we have to — always quoted in writing before the wrench turns.',
+    intro: 'Three trades under one roof. Flat-rate where the job allows, time and materials where it does not, and every quote in writing before work starts.',
     categories: [
       {
         name: 'Auto & Diesel',
@@ -228,12 +256,57 @@ export const siteConfig: KeystoneSiteConfig = reactive(({
     ],
   },
   testimonials: [
-    { quote: 'They quoted it, they hit the number, they hit the date. Three for three.', author: 'Eli M.', source: 'Google' },
-    { quote: 'Only shop in the county I trust with the whole fleet. Period.',           author: 'Dana R.', source: 'Google' },
-    { quote: 'Welds passed inspection first time. Stamped paperwork the same day.',     author: 'Sam K.',  source: 'Referral' },
+    { quote: 'The quote matched the invoice and the truck was ready the day they said. That is all I ask of a shop.', author: 'Eli M.', source: 'Google' },
+    { quote: 'They handle our whole fleet on a monthly schedule now. Fewer surprises, less downtime.', author: 'Dana R.', source: 'Google' },
+    { quote: 'Structural welds passed inspection the first time, and the stamped paperwork came the same day.', author: 'Sam K.', source: 'Referral' },
   ],
   social: [
     { label: 'Facebook', href: 'https://facebook.com' },
     { label: 'Google',   href: 'https://google.com' },
   ],
+  sections: {
+    nav: { home: 'Home', services: 'Services', work: 'Work', contact: 'Contact', ctaLabel: 'Get a quote' },
+    hero: { title: 'Diesel, welding, and build-outs.', ctaPrimary: 'See services', ctaSecondary: 'Get a quote' },
+    dispatch: { label: 'Dispatch', emergencyLabel: 'Emergency line' },
+    services: { eyebrow: 'What we do', title: 'Services & rates' },
+    capabilities: { eyebrow: 'Spec sheet', title: 'Capabilities' },
+    story: { eyebrow: 'The shop' },
+    projects: { eyebrow: 'Recent work', title: 'Jobs out the door' },
+    hours: {
+      eyebrow: 'When we\u2019re open',
+      title: 'Shop hours',
+      note: 'After-hours dispatch available for fleet contracts.',
+    },
+    reviews: { eyebrow: 'Customers', title: 'What customers say' },
+    servicesPage: {
+      eyebrow: 'Services & rates',
+      title: 'Services and rates',
+      subtitle: 'Three trades under one roof. Flat-rate where the job allows, time and materials where it does not, and every quote in writing before work starts.',
+      capabilitiesEyebrow: 'Spec sheet',
+      capabilitiesTitle: 'Equipped for the job',
+    },
+    projectsPage: {
+      eyebrow: 'Recent work',
+      title: 'Recent jobs',
+      subtitle: 'A sample of jobs delivered out of the Trinidad bay. References available in your trade on request.',
+      galleryEyebrow: 'From the floor',
+      galleryTitle: 'Daily work',
+    },
+    contactPage: {
+      eyebrow: 'Contact & dispatch',
+      title: 'Call the shop or send a quote request.',
+      subtitle: 'Walk-ins welcome during shop hours. Fleet, mobile field service, and emergency dispatch by phone.',
+      hoursEyebrow: 'Shop hours',
+      hoursNote: 'After-hours emergency dispatch for fleet contracts.',
+    },
+    booking: {
+      eyebrow: 'Book a service',
+      title: 'Schedule an appointment online',
+      intro: 'Pick a service and a time that works for you \u2014 we\u2019ll send a confirmation right away.',
+    },
+    contact: {
+      title: 'Request a quote',
+      intro: 'Tell us what you\u2019ve got. We\u2019ll come back with a written estimate and a realistic start date.',
+    },
+  },
 }))

@@ -24,7 +24,7 @@ const orders = ref<ShopOrderDTO[]>([])
 const addOnEnabled = ref(false)
 
 const newProduct = ref<ShopProductInput>({
-  sku: '', name: '', description: '', priceCents: 0, currency: 'USD', imageUrl: '', inventory: -1, active: true, sortOrder: 0,
+  sku: '', name: '', description: '', priceCents: 0, currency: 'USD', imageUrl: '', category: '', inventory: -1, active: true, sortOrder: 0,
 })
 
 async function load() {
@@ -50,6 +50,81 @@ async function load() {
   }
 }
 
+/* ── Products link ──
+   The shop catalog IS the site's Products content: the cards on the shop page
+   feed this list automatically, so owners don't retype what they already
+   wrote. Idempotent — matches on name, so re-running only adds what's new.
+   Prices/inventory are refined here. */
+function slugify(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+}
+
+const syncing = ref(false)
+const syncStatus = ref<string | null>(null)
+
+async function syncFromContent() {
+  if (!siteId.value || syncing.value) return
+  syncing.value = true
+  syncStatus.value = null
+  try {
+    const d = await contentClient.getDraft(siteId.value)
+    // Current content stores these under `featured`; older vault drafts used
+    // `products: { items: [...] }`.
+    const payload = d.payload as {
+      featured?: Array<{ name?: string; price?: string; blurb?: string; image?: string }>
+      products?: { items?: Array<{ name?: string; price?: string; description?: string; photo?: string }> }
+    }
+    const list: Array<{ name?: string; price?: string; blurb?: string; image?: string }> =
+      payload.featured?.length
+        ? payload.featured
+        : (payload.products?.items ?? []).map(p => ({
+            name: p.name, price: p.price, blurb: p.description, image: p.photo,
+          }))
+
+    const existing = new Set(products.value.map(p => p.name.toLowerCase()))
+    let added = 0
+    for (const item of list) {
+      const name = (item.name ?? '').trim()
+      if (!name || existing.has(name.toLowerCase())) continue
+      const priceCents = Math.round((parseFloat(String(item.price ?? '').replace(/[^0-9.]/g, '')) || 0) * 100)
+      const created = await contentClient.shopCreateProduct(siteId.value, {
+        sku: (slugify(name) || `product-${added + 1}`).slice(0, 40),
+        name,
+        description: item.blurb?.trim() || undefined,
+        priceCents,
+        currency: resolved.value?.currency || 'USD',
+        imageUrl: item.image?.trim() || undefined,
+        inventory: -1,
+        active: true,
+        sortOrder: products.value.length + added,
+      })
+      products.value.push(created)
+      existing.add(name.toLowerCase())
+      added++
+    }
+    syncStatus.value = added
+      ? `Imported ${added} product${added === 1 ? '' : 's'} from your Products page.`
+      : 'Everything on your Products page is already sellable here.'
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : String(e)
+  } finally {
+    syncing.value = false
+  }
+}
+
+/** Known "Category / Sub" values from the products already filed. */
+const categoryOptions = computed(() => {
+  const set = new Set<string>()
+  for (const p of products.value) {
+    const c = p.category?.trim()
+    if (!c) continue
+    set.add(c)
+    const top = c.split(/\s*\/\s*/)[0]
+    if (top) set.add(top)
+  }
+  return [...set].sort()
+})
+
 async function addProduct() {
   if (!siteId.value) return
   const p = newProduct.value
@@ -62,12 +137,13 @@ async function addProduct() {
       priceCents: Math.max(0, Math.round(p.priceCents)),
       currency: p.currency || resolved.value?.currency || 'USD',
       imageUrl: p.imageUrl?.trim() || undefined,
+      category: p.category?.trim() || undefined,
       inventory: p.inventory ?? -1,
       active: p.active ?? true,
       sortOrder: p.sortOrder ?? 0,
     })
     products.value.push(created)
-    newProduct.value = { sku: '', name: '', description: '', priceCents: 0, currency: resolved.value?.currency || 'USD', imageUrl: '', inventory: -1, active: true, sortOrder: 0 }
+    newProduct.value = { sku: '', name: '', description: '', priceCents: 0, currency: resolved.value?.currency || 'USD', imageUrl: '', category: '', inventory: -1, active: true, sortOrder: 0 }
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
   }
@@ -83,6 +159,7 @@ async function saveProduct(p: ShopProductDTO) {
       priceCents: Math.max(0, Math.round(p.priceCents)),
       currency: p.currency,
       imageUrl: p.imageUrl?.trim() || undefined,
+      category: p.category?.trim() || '',
       inventory: p.inventory,
       active: p.active,
       sortOrder: p.sortOrder,
@@ -161,8 +238,15 @@ function money(cents?: number, currency?: string) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency || resolved.value?.currency || 'USD' }).format(cents / 100)
 }
 
-onMounted(load)
-watch(siteId, load)
+/* Products -> Shop is a live link: after load, silently pull in anything on
+   the Products page that isn't sellable yet. The button in the catalog header
+   stays as a manual re-sync. */
+async function loadAndSync() {
+  await load()
+  await syncFromContent()
+}
+onMounted(loadAndSync)
+watch(siteId, loadAndSync)
 </script>
 
 <template>
@@ -201,14 +285,27 @@ watch(siteId, load)
       </div>
 
       <section class="adm-card">
-        <h2 class="adm-h2">Products</h2>
-        <p class="adm-muted adm-mb">Each product appears as a card on your shop page.</p>
+        <div class="shop-cat-head">
+          <div>
+            <h2 class="adm-h2">Products</h2>
+            <p class="adm-muted">Each product appears as a card on your shop page.</p>
+          </div>
+          <button type="button" class="adm-btn adm-btn--sm" :disabled="syncing" @click="syncFromContent">
+            {{ syncing ? 'Importing…' : 'Import from your Products page' }}
+          </button>
+        </div>
+        <p v-if="syncStatus" class="adm-muted adm-mb">{{ syncStatus }}</p>
 
+        <!-- Every category + subcategory already in use, so filing a product is a pick, not a retype. -->
+        <datalist id="shop-category-options">
+          <option v-for="c in categoryOptions" :key="c" :value="c" />
+        </datalist>
         <ul v-if="products.length" class="rm-list">
           <li v-for="p in products" :key="p.id" class="rm-row">
             <input class="adm-input rm-row__sku" v-model="p.sku" placeholder="SKU" />
             <input class="adm-input rm-row__name" v-model="p.name" placeholder="Name" />
             <input class="adm-input rm-row__desc" v-model="p.description" placeholder="Description" />
+            <input class="adm-input rm-row__cat" v-model="p.category" list="shop-category-options" placeholder="Category / Sub" title="Category, then an optional subcategory: Apparel / Hats" />
             <div class="rm-row__price"><MoneyInput v-model="p.priceCents" :currency="resolved?.currency || 'USD'" /></div>
             <div class="rm-row__inv"><NumberInput v-model="p.inventory" :min="-1" unit="stock" /></div>
             <div class="rm-row__img"><ImageInput :model-value="p.imageUrl ?? ''" :site-id="siteId" aspect="1 / 1" @update:model-value="(v: string) => p.imageUrl = v" /></div>
@@ -223,6 +320,7 @@ watch(siteId, load)
           <input class="adm-input rm-row__sku" v-model="newProduct.sku" placeholder="SKU" />
           <input class="adm-input rm-row__name" v-model="newProduct.name" placeholder="Name" />
           <input class="adm-input rm-row__desc" v-model="newProduct.description" placeholder="Description" />
+          <input class="adm-input rm-row__cat" v-model="newProduct.category" list="shop-category-options" placeholder="Category / Sub" title="Category, then an optional subcategory: Apparel / Hats" />
           <div class="rm-row__price"><MoneyInput v-model="newProduct.priceCents" :currency="resolved?.currency || 'USD'" /></div>
           <div class="rm-row__inv"><NumberInput v-model="newProduct.inventory" :min="-1" unit="stock" /></div>
           <div class="rm-row__img"><ImageInput :model-value="newProduct.imageUrl ?? ''" :site-id="siteId" aspect="1 / 1" @update:model-value="(v: string) => newProduct.imageUrl = v" /></div>
@@ -305,9 +403,14 @@ watch(siteId, load)
 .adm-h2 { margin: 0 0 0.4rem; font-size: 1.05rem; }
 .adm-mb { margin-bottom: 0.75rem; }
 .addon-gate { padding: 1rem 1.1rem; margin-bottom: 1rem; }
+.shop-cat-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.75rem;
+}
+.shop-cat-head .adm-muted { margin: 0; }
 
 .rm-list { list-style: none; padding: 0; margin: 0 0 0.75rem; display: flex; flex-direction: column; gap: 0.35rem; }
-.rm-row { display: grid; grid-template-columns: 7rem 10rem 1fr 6rem 5rem 1.3fr 3rem auto auto; gap: 0.3rem; align-items: center; }
+.rm-row { display: grid; grid-template-columns: 7rem 10rem 1fr 9rem 6rem 5rem 1.3fr 3rem auto auto; gap: 0.3rem; align-items: center; }
 .rm-row--new { padding-top: 0.5rem; border-top: 1px dashed var(--adm-border); }
 .rm-row__active { display: flex; align-items: center; gap: 0.25rem; font-size: 0.78rem; color: var(--adm-text-subtle); }
 

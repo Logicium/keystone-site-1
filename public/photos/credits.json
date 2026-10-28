@@ -1,8 +1,88 @@
 {
   "template": "keystone",
   "license": "Unsplash License",
-  "generatedAt": "2026-07-24T02:46:35.781Z",
+  "generatedAt": "2026-09-22T04:02:45.401Z",
   "photos": [
+    {
+      "file": "gallery-07.jpg",
+      "photographer": "BHARAT VISHAWAKARMA",
+      "photographerUrl": "https://unsplash.com/@bharat05?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/men-working-on-a-car-engine-outdoors-GZ70X-8ZXMs?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "GZ70X-8ZXMs",
+      "alt": "Engine bay teardown"
+    },
+    {
+      "file": "gallery-08.jpg",
+      "photographer": "Glenn Hansen",
+      "photographerUrl": "https://unsplash.com/@hansenhouse?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/time-lapse-photography-of-welding-man-VW4xiLRr-do?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "VW4xiLRr-do",
+      "alt": "TIG bead on stainless"
+    },
+    {
+      "file": "gallery-09.jpg",
+      "photographer": "Ziph",
+      "photographerUrl": "https://unsplash.com/@sheen_xcllnt?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/a-large-metal-structure-with-a-sky-in-the-background-GM9pSXlZlUU?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "GM9pSXlZlUU",
+      "alt": "Steel beam set on a build-out"
+    },
+    {
+      "file": "gallery-10.jpg",
+      "photographer": "Brian Wangenheim",
+      "photographerUrl": "https://unsplash.com/@brianwangenheim?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/a-white-truck-parked-in-a-garage-next-to-a-garage-door-6r6Elg5qAws?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "6r6Elg5qAws",
+      "alt": "Fleet truck on the lift"
+    },
+    {
+      "file": "gallery-11.jpg",
+      "photographer": "Jakub Skafiriak",
+      "photographerUrl": "https://unsplash.com/@jakubskafiriak?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/time-lapse-photography-of-person-grinding-during-nighttime-AljDaiCbCVY?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "AljDaiCbCVY",
+      "alt": "Plasma table cutting plate"
+    },
+    {
+      "file": "gallery-12.jpg",
+      "photographer": "s w",
+      "photographerUrl": "https://unsplash.com/@wengenroad?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/brown-wooden-workbench-mNWsZDYUCFs?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "mNWsZDYUCFs",
+      "alt": "Bench, end of shift"
+    },
+    {
+      "file": "gallery-13.jpg",
+      "photographer": "Kiefer Likens",
+      "photographerUrl": "https://unsplash.com/@kiefer?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/man-welding-white-utility-trailer-kW2axONQXxE?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "kW2axONQXxE",
+      "alt": "Hitch fabrication"
+    },
+    {
+      "file": "gallery-14.jpg",
+      "photographer": "Pim de Boer",
+      "photographerUrl": "https://unsplash.com/@puntertje?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/a-truck-is-parked-in-a-field-at-sunset-HSQ1Tj3n9oo?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "HSQ1Tj3n9oo",
+      "alt": "Diesel pickup after service"
+    },
+    {
+      "file": "gallery-15.jpg",
+      "photographer": "Jan Huber",
+      "photographerUrl": "https://unsplash.com/@jan_huber?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/a-construction-site-with-a-crane-in-the-background-kO8f82u73Es?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "kO8f82u73Es",
+      "alt": "Framing a commercial bay"
+    },
+    {
+      "file": "gallery-16.jpg",
+      "photographer": "Zoshua Colah",
+      "photographerUrl": "https://unsplash.com/@zoshuacolah?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "photoUrl": "https://unsplash.com/photos/man-standing-in-a-cluttered-industrial-workshop-OX3fv8D6QAk?utm_source=Apotome%20Archetypes&utm_medium=referral",
+      "unsplashId": "OX3fv8D6QAk",
+      "alt": "The shop floor at dawn"
+    },
     {
       "file": "hero.jpg",
       "photographer": "Josh Beech",

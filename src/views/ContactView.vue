@@ -15,13 +15,15 @@ const showBooking = computed(() => store.hasAddOn('appointments'))
 <template>
   <HeroSection
     subpage
-    eyebrow="Contact & dispatch"
-    title="Call the shop. Or send a quote request."
-    subtitle="Walk-ins welcome during shop hours. Fleet, mobile field service, and emergency dispatch by phone."
+    :eyebrow="siteConfig.sections.contactPage.eyebrow"
+    :title="siteConfig.sections.contactPage.title"
+    :subtitle="siteConfig.sections.contactPage.subtitle"
     :image="siteConfig.photos.hero.src"
   />
 
   <DispatchBar
+    :label="siteConfig.sections.dispatch.label"
+    :emergency-label="siteConfig.sections.dispatch.emergencyLabel"
     :phone="siteConfig.dispatch.phone"
     :emergency="siteConfig.dispatch.emergency"
     :emergency-phone="siteConfig.dispatch.emergencyPhone"
@@ -30,14 +32,14 @@ const showBooking = computed(() => store.hasAddOn('appointments'))
 
   <BookingSection
     v-if="showBooking"
-    eyebrow="Book a service"
-    title="Schedule an appointment online"
-    intro="Pick a service and a time that works for you — we'll send a confirmation right away."
+    :eyebrow="siteConfig.sections.booking.eyebrow"
+    :title="siteConfig.sections.booking.title"
+    :intro="siteConfig.sections.booking.intro"
   />
 
   <ContactSection
-    title="Request a quote"
-    intro="Tell us what you've got. We'll come back with a written estimate and a realistic start date."
+    :title="siteConfig.sections.contact.title"
+    :intro="siteConfig.sections.contact.intro"
     :address="siteConfig.contact.address"
     :phone="siteConfig.contact.phone"
     :email="siteConfig.contact.email"
@@ -45,8 +47,9 @@ const showBooking = computed(() => store.hasAddOn('appointments'))
   />
 
   <HoursSection
-    eyebrow="Shop hours"
+    :eyebrow="siteConfig.sections.contactPage.hoursEyebrow"
+    :title="siteConfig.sections.hours.title"
     :hours="siteConfig.hours"
-    note="After-hours emergency dispatch for fleet contracts."
+    :note="siteConfig.sections.contactPage.hoursNote"
   />
 </template>

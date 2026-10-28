@@ -29,12 +29,12 @@ const IMG = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=c
 // ── Shop (Vault · E-Shop add-on) ─────────────────────────────────────────
 
 const shopProducts = [
-  { id: 'demo-p1', sku: 'CANDLE-01', name: 'Juniper Ridge Candle', description: 'Hand-poured soy candle, 40-hour burn.', priceCents: 2400, currency: 'USD', imageUrl: IMG('photo-1602874801007-bd458bb1b8b6'), inventory: 14, active: true, sortOrder: 1 },
-  { id: 'demo-p2', sku: 'MUG-01', name: 'Stoneware Mug', description: 'Wheel-thrown, dishwasher safe, 12 oz.', priceCents: 3200, currency: 'USD', imageUrl: IMG('photo-1514228742587-6b1558fcca3d'), inventory: 22, active: true, sortOrder: 2 },
-  { id: 'demo-p3', sku: 'TOTE-01', name: 'Waxed Canvas Tote', description: 'Heavy 18 oz canvas with leather straps.', priceCents: 5800, currency: 'USD', imageUrl: IMG('photo-1544816155-12df9643f363'), inventory: 9, active: true, sortOrder: 3 },
-  { id: 'demo-p4', sku: 'PRINT-01', name: 'Fisher’s Peak Print', description: 'Archival giclée, 12×16, signed.', priceCents: 4500, currency: 'USD', imageUrl: IMG('photo-1465101162946-4377e57745c3'), inventory: 30, active: true, sortOrder: 4 },
-  { id: 'demo-p5', sku: 'SOAP-01', name: 'Cedar & Sage Soap', description: 'Cold-process bar, essential oils only.', priceCents: 900, currency: 'USD', imageUrl: IMG('photo-1600857544200-b2f666a9a2ec'), inventory: 48, active: true, sortOrder: 5 },
-  { id: 'demo-p6', sku: 'HOODIE-01', name: 'Trail Hoodie', description: 'Midweight fleece, embroidered logo.', priceCents: 6400, currency: 'USD', imageUrl: IMG('photo-1556821840-3a63f95609a7'), inventory: 0, active: true, sortOrder: 6 },
+  { id: 'demo-p1', sku: 'CANDLE-01', category: 'Home / Candles', name: 'Juniper Ridge Candle', description: 'Hand-poured soy candle, 40-hour burn.', priceCents: 2400, currency: 'USD', imageUrl: IMG('photo-1602874801007-bd458bb1b8b6'), inventory: 14, active: true, sortOrder: 1 },
+  { id: 'demo-p2', sku: 'MUG-01', category: 'Home / Kitchen', name: 'Stoneware Mug', description: 'Wheel-thrown, dishwasher safe, 12 oz.', priceCents: 3200, currency: 'USD', imageUrl: IMG('photo-1514228742587-6b1558fcca3d'), inventory: 22, active: true, sortOrder: 2 },
+  { id: 'demo-p3', sku: 'TOTE-01', category: 'Apparel / Bags', name: 'Waxed Canvas Tote', description: 'Heavy 18 oz canvas with leather straps.', priceCents: 5800, currency: 'USD', imageUrl: IMG('photo-1544816155-12df9643f363'), inventory: 9, active: true, sortOrder: 3 },
+  { id: 'demo-p4', sku: 'PRINT-01', category: 'Home / Art', name: 'Fisher’s Peak Print', description: 'Archival giclée, 12×16, signed.', priceCents: 4500, currency: 'USD', imageUrl: IMG('photo-1465101162946-4377e57745c3'), inventory: 30, active: true, sortOrder: 4 },
+  { id: 'demo-p5', sku: 'SOAP-01', category: 'Home / Bath', name: 'Cedar & Sage Soap', description: 'Cold-process bar, essential oils only.', priceCents: 900, currency: 'USD', imageUrl: IMG('photo-1600857544200-b2f666a9a2ec'), inventory: 48, active: true, sortOrder: 5 },
+  { id: 'demo-p6', sku: 'HOODIE-01', category: 'Apparel / Tops', name: 'Trail Hoodie', description: 'Midweight fleece, embroidered logo.', priceCents: 6400, currency: 'USD', imageUrl: IMG('photo-1556821840-3a63f95609a7'), inventory: 0, active: true, sortOrder: 6 },
 ]
 
 const SHOP_SHIPPING_CENTS = 800
@@ -108,6 +108,10 @@ const demoMenu = [
   { id: 'demo-m5', sku: 'MN-03', name: 'Mushroom Pozole', description: 'Hominy, guajillo broth, all the fixings. Vegan.', priceCents: 1600, category: 'Mains', imageUrl: IMG('photo-1547592180-85f173990554'), active: true, sortOrder: 5 },
   { id: 'demo-m6', sku: 'DS-01', name: 'Sopapillas & Honey', description: 'Fried to order, local honey, cinnamon sugar.', priceCents: 700, category: 'Desserts', imageUrl: IMG('photo-1551024601-bec78aea704b'), active: true, sortOrder: 6 },
   { id: 'demo-m7', sku: 'DR-01', name: 'Prickly Pear Agua Fresca', description: 'House-made, not too sweet.', priceCents: 450, category: 'Drinks', imageUrl: IMG('photo-1544145945-f90425340c7e'), active: true, sortOrder: 7 },
+  // One dish in two sizes: shows size grouping in the demo, and exercises the
+  // path that collapses legacy per-size items into one card with size buttons.
+  { id: 'demo-m8', sku: 'MN-04', name: 'Green Chile Stew (Cup)', description: 'Pork, potatoes, plenty of Hatch.', priceCents: 700, category: 'Mains', imageUrl: IMG('photo-1583224944844-5b268c057b72'), active: true, sortOrder: 8 },
+  { id: 'demo-m9', sku: 'MN-05', name: 'Green Chile Stew (Bowl)', description: '', priceCents: 1100, category: 'Mains', imageUrl: IMG('photo-1583224944844-5b268c057b72'), active: true, sortOrder: 9 },
 ]
 
 // ── Lodging (Hearth · Reservations add-on) ───────────────────────────────
@@ -286,7 +290,7 @@ export const demoClient = {
       name: payload.name, email: payload.email, phone: payload.phone, notes: payload.notes,
       pickupAt: payload.pickupAt, items, subtotalCents,
       totalCents: subtotalCents, currency: 'USD',
-      status: 'confirmed', createdAt: new Date().toISOString(),
+      status: 'confirmed', paymentStatus: 'paid', createdAt: new Date().toISOString(),
     }
   },
 

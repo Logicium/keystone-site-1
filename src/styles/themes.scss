@@ -1720,3 +1720,13 @@
     transform: translate3d(0, calc(var(--ap-hero-parallax-y, 0px) * -0.25), 0) !important;
   }
 }
+
+/* ── Ironwood · the trade catalog and the dispatch strip ───────────── */
+[data-theme='ironwood'] .ks-services .ks-services__cat-head { border-bottom: 2px solid var(--ap-ink); }
+[data-theme='ironwood'] .ks-services .ks-services__cat-head h3 { font-size: 1.4rem; letter-spacing: 0.02em; }
+[data-theme='ironwood'] .ks-services .ks-services__row { border-bottom: 1px solid var(--ap-line); }
+[data-theme='ironwood'] .ks-services .ks-services__name { font-family: var(--ap-font-body); font-weight: 600; }
+[data-theme='ironwood'] .ks-services .ks-services__price { color: var(--ap-ink); }
+[data-theme='ironwood'] .ks-services .ks-services__tags span { border-color: var(--ap-ink); background: transparent; color: var(--ap-ink); font-family: var(--ap-font-mono); letter-spacing: 0.12em; }
+[data-theme='ironwood'] .ks-dispatch { border-top: 0; }
+[data-theme='ironwood'] .ks-projects h3 { text-transform: uppercase; }

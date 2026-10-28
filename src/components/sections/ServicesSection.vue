@@ -2,13 +2,13 @@
 interface ServiceItem { name: string; description?: string; price: string; tags?: string[] }
 interface ServiceCategory { name: string; description?: string; items: ServiceItem[] }
 
-defineProps<{
+withDefaults(defineProps<{
   eyebrow?: string
   title?: string
   intro?: string
   categories: ServiceCategory[]
   quoteCta?: { label: string; to: string }
-}>()
+}>(), { title: 'Services & rates' })
 </script>
 
 <!--
@@ -19,15 +19,15 @@ defineProps<{
   "Same-day" / "Mobile" / "Certified".
 -->
 <template>
-  <section class="ap-section ks-services">
+  <section class="ap-section ks-services" data-index>
     <div class="ap-container">
       <div class="ap-section-head">
         <span v-if="eyebrow" class="ap-eyebrow">{{ eyebrow }}</span>
-        <h2>{{ title || 'Services & rates' }}</h2>
+        <h2 v-lines>{{ title }}</h2>
         <p v-if="intro" style="color: var(--ap-ink-muted); max-width: 60ch;">{{ intro }}</p>
       </div>
 
-      <div class="ks-services__grid">
+      <div class="ks-services__grid" v-cascade="110">
         <section v-for="cat in categories" :key="cat.name" class="ks-services__cat">
           <header class="ks-services__cat-head">
             <h3>{{ cat.name }}</h3>

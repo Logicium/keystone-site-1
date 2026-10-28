@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
-import { type MenuItemDTO } from '../../platform/contentClient'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { contentClient, type MealOrderDTO, type MenuItemDTO } from '../../platform/contentClient'
+import { groupByBase, type SizedEntry } from '../../platform/menuSizes'
 import { apiClient } from '../../platform/apiClient'
 import { PLATFORM_SLUG, DEMO_MODE } from '../../platform/config'
 import DemoBadge from '../DemoBadge.vue'
@@ -36,7 +37,7 @@ const form = reactive({
 const submitting = ref(false)
 const submitError = ref<string | null>(null)
 
-interface Confirmed { id: string; pickupAt: string; totalCents: number; currency: string }
+interface Confirmed { id: string; pickupAt: string; totalCents: number; currency: string; paid: boolean }
 const confirmed = ref<Confirmed | null>(null)
 
 function money(cents: number, code = currency.value): string {
@@ -68,6 +69,92 @@ const slotsByDay = computed(() => {
   return [...groups.entries()]
 })
 
+/* ── Pickup time picker ──
+   A week of 15-minute slots is ~90 pills, which testers read as a wall of
+   noise. Show one day at a time, and split a busy day into parts of the day,
+   so the customer scans a handful of times instead of the whole schedule.
+   Most people just want the next available slot, so that gets a one-tap chip. */
+
+const selectedDay = ref<string | null>(null)
+const selectedPeriod = ref<string | null>(null)
+
+/** Hour (0-23) of a slot in the shop's timezone, not the browser's. */
+function hourIn(iso: string): number {
+  return parseInt(new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone.value, hour: 'numeric', hour12: false,
+  }).format(new Date(iso)), 10)
+}
+
+function timeLabel(iso: string): string {
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone.value, hour: 'numeric', minute: '2-digit',
+  }).format(new Date(iso))
+}
+
+/** Short day label for the day chips: "Fri Aug 14" -> { top: 'Fri', sub: 'Aug 14' }. */
+function dayChip(day: string): { top: string; sub: string } {
+  const [weekday, ...rest] = day.split(', ')
+  return { top: weekday ?? day, sub: rest.join(', ') }
+}
+
+const days = computed(() => slotsByDay.value.map(([day]) => day))
+
+/** Slots for the chosen day (falling back to the first day with any). */
+const daySlots = computed<string[]>(() => {
+  const entry = slotsByDay.value.find(([day]) => day === selectedDay.value)
+  return entry?.[1] ?? slotsByDay.value[0]?.[1] ?? []
+})
+
+const PERIODS: Array<{ id: string; label: string; test: (h: number) => boolean }> = [
+  { id: 'morning', label: 'Morning', test: h => h < 12 },
+  { id: 'afternoon', label: 'Afternoon', test: h => h >= 12 && h < 17 },
+  { id: 'evening', label: 'Evening', test: h => h >= 17 },
+]
+
+/** Only the parts of the day this day actually has slots in. */
+const periods = computed(() =>
+  PERIODS.map(p => ({ ...p, slots: daySlots.value.filter(s => p.test(hourIn(s))) }))
+    .filter(p => p.slots.length))
+
+/** A short day needs no second level of chips — don't add clicks for 6 times. */
+const PERIOD_THRESHOLD = 12
+const usePeriods = computed(() => daySlots.value.length > PERIOD_THRESHOLD && periods.value.length > 1)
+
+const visibleSlots = computed<string[]>(() => {
+  if (!usePeriods.value) return daySlots.value
+  const active = periods.value.find(p => p.id === selectedPeriod.value) ?? periods.value[0]
+  return active?.slots ?? []
+})
+
+/** The next available pickup, for the one-tap chip. */
+const soonest = computed<string | null>(() => slots.value[0] ?? null)
+
+function pickSoonest() {
+  const s = soonest.value
+  if (!s) return
+  form.pickupAt = s
+  // Move the picker to that slot so the selection is visible in context.
+  const day = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone.value, weekday: 'short', month: 'short', day: 'numeric',
+  }).format(new Date(s))
+  selectedDay.value = day
+  selectedPeriod.value = PERIODS.find(p => p.test(hourIn(s)))?.id ?? null
+}
+
+function selectDay(day: string) {
+  selectedDay.value = day
+  // Land on the first part of that day that has times.
+  selectedPeriod.value = null
+  selectedPeriod.value = periods.value[0]?.id ?? null
+}
+
+// Default to the first day/period once slots arrive.
+watch(slots, () => {
+  if (!slots.value.length) { selectedDay.value = null; selectedPeriod.value = null; return }
+  selectedDay.value = days.value[0] ?? null
+  selectedPeriod.value = periods.value[0]?.id ?? null
+})
+
 async function load() {
   if (!slug.value) {
     error.value = 'Ordering unavailable — site not configured.'
@@ -97,6 +184,15 @@ function itemById(id: string) { return items.value.find(i => i.id === id) }
 function itemsInCategory(cat: string) {
   return items.value.filter(i => (i.category || '') === cat)
 }
+/** Kitchens model sizes as separate items ("Pepperoni 12\"", "Pepperoni 16\"");
+    render those as ONE dish with a size button each. Every button still adds
+    its own real menu item, so pricing, checkout and tickets are unchanged. */
+function entriesInCategory(cat: string): Array<SizedEntry<MenuItemDTO>> {
+  return groupByBase(itemsInCategory(cat), i => i.name)
+}
+function sizedDescription(e: SizedEntry<MenuItemDTO>): string | undefined {
+  return e.kind === 'sized' ? e.variants.map(v => v.item.description).find(Boolean) : undefined
+}
 
 function add(item: MenuItemDTO) {
   const existing = cart.value.find(l => l.menuItemId === item.id)
@@ -115,12 +211,16 @@ const totalCents = computed(() =>
   cart.value.reduce((sum, l) => sum + ((itemById(l.menuItemId)?.priceCents ?? 0) * l.quantity), 0),
 )
 
+function remember(o: MealOrderDTO) {
+  confirmed.value = { id: o.id, pickupAt: o.pickupAt, totalCents: o.totalCents, currency: o.currency, paid: o.paymentStatus === 'paid' }
+}
+
 async function checkout() {
   if (!cart.value.length || !form.pickupAt) return
   submitting.value = true
   submitError.value = null
   try {
-    const res = await apiClient.orderingCreateOrder({
+    const payload = {
       siteSlug: slug.value,
       name: form.name.trim(),
       email: form.email.trim(),
@@ -128,8 +228,22 @@ async function checkout() {
       notes: form.notes.trim() || undefined,
       pickupAt: form.pickupAt,
       items: cart.value.map(l => ({ menuItemId: l.menuItemId, quantity: l.quantity, notes: l.notes })),
-    })
-    confirmed.value = { id: res.id, pickupAt: res.pickupAt, totalCents: res.totalCents, currency: res.currency }
+    }
+
+    // Live sites route through Stripe Checkout (destination charge to the
+    // owner). Demo mode has no backend session, so it places the order
+    // directly and shows the simulated confirmation.
+    if (!DEMO_MODE) {
+      const res = await contentClient.orderingCheckout({ ...payload, returnPath: window.location.pathname })
+      if (res.checkoutUrl) {
+        window.location.href = res.checkoutUrl
+        return
+      }
+      // Pay at pickup — owner not payment-onboarded, or online payment is off.
+      remember(res.order)
+    } else {
+      remember(await apiClient.orderingCreateOrder(payload))
+    }
     cart.value = []
     cartOpen.value = false
     await load()
@@ -149,7 +263,29 @@ function reset() {
   form.pickupAt = ''
 }
 
-onMounted(load)
+/** After returning from Stripe Checkout, verify payment and show confirmation. */
+async function handleCheckoutReturn() {
+  if (DEMO_MODE) return
+  const params = new URLSearchParams(window.location.search)
+  const orderId = params.get('order')
+  const status = params.get('status')
+  if (!orderId) return
+  if (status === 'success') {
+    try {
+      remember(await contentClient.orderingConfirmOrder(orderId))
+    } catch { /* leave the menu as-is if confirmation fails */ }
+  } else if (status === 'cancelled') {
+    submitError.value = 'Payment was cancelled. Your order was not placed.'
+    cartOpen.value = true
+  }
+  // Strip the query so a refresh doesn't re-confirm.
+  window.history.replaceState({}, '', window.location.pathname)
+}
+
+onMounted(async () => {
+  await load()
+  await handleCheckoutReturn()
+})
 </script>
 
 <template>
@@ -166,7 +302,7 @@ onMounted(load)
         <div class="ap-ordering__confirmation-icon" aria-hidden="true">✓</div>
         <h3>Order received.</h3>
         <p>Pickup at <strong>{{ formatSlot(confirmed.pickupAt) }}</strong></p>
-        <p>Total: <strong>{{ money(confirmed.totalCents, confirmed.currency) }}</strong></p>
+        <p>Total: <strong>{{ money(confirmed.totalCents, confirmed.currency) }}</strong> · {{ confirmed.paid ? 'Paid' : 'Pay at pickup' }}</p>
         <p class="ap-ordering__hint">We emailed you a copy. See you soon.</p>
         <button type="button" class="ap-btn ap-btn--ghost" @click="reset">Order again</button>
       </div>
@@ -180,13 +316,35 @@ onMounted(load)
           <div v-for="cat in categories" :key="cat || '_all'" class="ap-ordering__cat">
             <h3 v-if="cat" class="ap-ordering__cat-title">{{ cat }}</h3>
             <ul class="ap-ordering__items">
-              <li v-for="i in itemsInCategory(cat)" :key="i.id" class="ap-ordering__item">
-                <div class="ap-ordering__item-body">
-                  <h4>{{ i.name }}</h4>
-                  <p v-if="i.description" class="ap-ordering__item-desc">{{ i.description }}</p>
-                  <span class="ap-ordering__item-price">{{ money(i.priceCents, i.currency) }}</span>
-                </div>
-                <button type="button" class="ap-btn ap-btn--sm" @click="add(i)">Add</button>
+              <li
+                v-for="e in entriesInCategory(cat)"
+                :key="e.kind === 'single' ? e.item.id : e.base"
+                class="ap-ordering__item"
+              >
+                <template v-if="e.kind === 'single'">
+                  <div class="ap-ordering__item-body">
+                    <h4>{{ e.item.name }}</h4>
+                    <p v-if="e.item.description" class="ap-ordering__item-desc">{{ e.item.description }}</p>
+                    <span class="ap-ordering__item-price">{{ money(e.item.priceCents, e.item.currency) }}</span>
+                  </div>
+                  <button type="button" class="ap-btn ap-btn--sm" @click="add(e.item)">Add</button>
+                </template>
+                <template v-else>
+                  <div class="ap-ordering__item-body">
+                    <h4>{{ e.base }}</h4>
+                    <p v-if="sizedDescription(e)" class="ap-ordering__item-desc">{{ sizedDescription(e) }}</p>
+                    <div class="ap-ordering__sizes">
+                      <button
+                        v-for="v in e.variants" :key="v.item.id" type="button"
+                        class="ap-ordering__size"
+                        @click="add(v.item)"
+                      >
+                        {{ v.label }}
+                        <span class="ap-ordering__size-price">{{ money(v.item.priceCents, v.item.currency) }}</span>
+                      </button>
+                    </div>
+                  </div>
+                </template>
               </li>
             </ul>
           </div>
@@ -241,15 +399,65 @@ onMounted(load)
             <fieldset class="ap-ordering__slots">
               <legend>Choose a pickup time</legend>
               <p v-if="!slots.length" class="ap-ordering__hint">No pickup times available right now.</p>
-              <div v-for="[day, daySlots] in slotsByDay" :key="day" class="ap-ordering__slot-day">
-                <div class="ap-ordering__slot-day-label">{{ day }}</div>
+
+              <template v-else>
+                <!-- Most people want the next one; make that a single tap. -->
+                <button
+                  v-if="soonest"
+                  type="button"
+                  class="ap-ordering__soonest"
+                  :class="{ 'is-active': form.pickupAt === soonest }"
+                  @click="pickSoonest"
+                >
+                  <span class="ap-ordering__soonest-label">Soonest</span>
+                  <span class="ap-ordering__soonest-time">{{ formatSlot(soonest) }}</span>
+                </button>
+
+                <!-- Day pagination: one day of times at a time. -->
+                <div class="ap-ordering__days" role="tablist" aria-label="Pickup day">
+                  <button
+                    v-for="day in days"
+                    :key="day"
+                    type="button"
+                    role="tab"
+                    class="ap-ordering__day"
+                    :class="{ 'is-active': day === selectedDay }"
+                    :aria-selected="day === selectedDay"
+                    @click="selectDay(day)"
+                  >
+                    <span class="ap-ordering__day-top">{{ dayChip(day).top }}</span>
+                    <span class="ap-ordering__day-sub">{{ dayChip(day).sub }}</span>
+                  </button>
+                </div>
+
+                <!-- Second level only when a day is genuinely busy. -->
+                <div v-if="usePeriods" class="ap-ordering__periods" role="tablist" aria-label="Time of day">
+                  <button
+                    v-for="p in periods"
+                    :key="p.id"
+                    type="button"
+                    role="tab"
+                    class="ap-ordering__period"
+                    :class="{ 'is-active': p.id === selectedPeriod }"
+                    :aria-selected="p.id === selectedPeriod"
+                    @click="selectedPeriod = p.id"
+                  >
+                    {{ p.label }}
+                    <span class="ap-ordering__period-count">{{ p.slots.length }}</span>
+                  </button>
+                </div>
+
                 <div class="ap-ordering__slot-grid">
-                  <label v-for="s in daySlots" :key="s" class="ap-ordering__slot">
+                  <label v-for="s in visibleSlots" :key="s" class="ap-ordering__slot">
                     <input type="radio" name="pickup" :value="s" v-model="form.pickupAt" required />
-                    <span>{{ new Intl.DateTimeFormat('en-US', { timeZone: timezone, hour: 'numeric', minute: '2-digit' }).format(new Date(s)) }}</span>
+                    <span>{{ timeLabel(s) }}</span>
                   </label>
                 </div>
-              </div>
+
+                <p v-if="form.pickupAt" class="ap-ordering__slot-chosen">
+                  Pickup <strong>{{ formatSlot(form.pickupAt) }}</strong>
+                </p>
+              </template>
             </fieldset>
 
             <label class="ap-ordering__field ap-ordering__field--full">
@@ -291,6 +499,20 @@ onMounted(load)
 .ap-ordering__item-body h4 { margin: 0; font-size: 1rem; }
 .ap-ordering__item-desc { margin: 0; color: var(--ap-ink-muted); font-size: 0.88rem; }
 .ap-ordering__item-price { font-weight: 600; font-size: 0.95rem; }
+/* Size buttons on a grouped dish: each one is its own "Add" */
+.ap-ordering__sizes { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.35rem; }
+.ap-ordering__size {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.32rem 0.7rem;
+  border: 1px solid var(--ap-line);
+  border-radius: 999px;
+  background: transparent; color: var(--ap-ink);
+  font: inherit; font-size: 0.82rem; font-weight: 600;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+.ap-ordering__size:hover { border-color: var(--ap-primary); background: color-mix(in srgb, var(--ap-primary) 8%, transparent); }
+.ap-ordering__size-price { font-weight: 500; color: var(--ap-ink-muted); font-size: 0.78rem; }
 .ap-ordering__cart-fab {
   position: fixed;
   right: 1.25rem; bottom: 1.25rem;
@@ -340,6 +562,95 @@ onMounted(load)
 .ap-ordering__slots legend { font-size: 0.9rem; padding: 0 0.4rem; }
 .ap-ordering__slot-day { margin-top: 0.6rem; }
 .ap-ordering__slot-day-label { font-size: 0.78rem; color: var(--ap-ink-muted); margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* ── Soonest: the one-tap path most customers want ── */
+.ap-ordering__soonest {
+  display: flex; align-items: baseline; gap: 0.6rem;
+  width: 100%;
+  margin: 0.5rem 0 0.9rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--ap-line, #ddd);
+  border-radius: var(--ap-radius, 10px);
+  background: var(--ap-surface-alt, #fafafa);
+  color: var(--ap-ink, #111);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+.ap-ordering__soonest:hover { border-color: var(--ap-ink, #111); }
+.ap-ordering__soonest.is-active {
+  background: var(--ap-ink, #111);
+  border-color: var(--ap-ink, #111);
+  color: var(--ap-surface, #fff);
+}
+.ap-ordering__soonest-label {
+  font-family: var(--ap-font-mono, monospace);
+  font-size: 0.62rem; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  opacity: 0.7;
+}
+.ap-ordering__soonest-time { font-size: 0.95rem; font-weight: 600; }
+
+/* ── Day pagination ── */
+.ap-ordering__days {
+  display: flex; gap: 0.35rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  margin-bottom: 0.6rem;
+  scrollbar-width: none;
+}
+.ap-ordering__days::-webkit-scrollbar { display: none; }
+.ap-ordering__day {
+  display: flex; flex-direction: column; align-items: center; gap: 0.1rem;
+  flex: 0 0 auto;
+  min-width: 4.6rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--ap-line, #ddd);
+  border-radius: var(--ap-radius, 10px);
+  background: var(--ap-surface, #fff);
+  color: var(--ap-ink, #111);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
+}
+.ap-ordering__day:hover { border-color: var(--ap-ink, #111); }
+.ap-ordering__day.is-active {
+  background: var(--ap-ink, #111);
+  border-color: var(--ap-ink, #111);
+  color: var(--ap-surface, #fff);
+}
+.ap-ordering__day-top { font-size: 0.82rem; font-weight: 600; }
+.ap-ordering__day-sub { font-size: 0.68rem; opacity: 0.72; white-space: nowrap; }
+
+/* ── Time of day ── */
+.ap-ordering__periods { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.6rem; }
+.ap-ordering__period {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  padding: 0.3rem 0.7rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--ap-ink-muted, #666);
+  font: inherit; font-size: 0.82rem;
+  cursor: pointer;
+  transition: color 140ms ease, border-color 140ms ease;
+}
+.ap-ordering__period:hover { color: var(--ap-ink, #111); }
+.ap-ordering__period.is-active { color: var(--ap-ink, #111); border-bottom-color: var(--ap-primary, #111); font-weight: 600; }
+.ap-ordering__period-count {
+  font-family: var(--ap-font-mono, monospace);
+  font-size: 0.62rem;
+  opacity: 0.6;
+}
+
+.ap-ordering__slot-chosen {
+  margin: 0.7rem 0 0;
+  font-size: 0.85rem;
+  color: var(--ap-ink-muted, #666);
+}
+.ap-ordering__slot-chosen strong { color: var(--ap-ink, #111); }
+
 .ap-ordering__slot-grid { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .ap-ordering__slot {
   display: inline-flex;
