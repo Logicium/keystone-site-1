@@ -3,6 +3,7 @@ import { onMounted } from 'vue'
 import { RouterView } from 'vue-router'
 import { siteConfig } from './config/site.config'
 import { useSiteTheme } from '@apotome/archetype-shared/composables/useSiteTheme'
+import { useSiteSeo } from '@apotome/archetype-shared/platform/seo'
 import { useImagePreload } from '@apotome/archetype-shared/composables/useImagePreload'
 import { useApScrollbar } from '@apotome/archetype-shared/composables/useApScrollbar'
 import { usePreferences } from '@apotome/archetype-shared/composables/usePreferences'
@@ -12,6 +13,23 @@ import AppLoader from '@apotome/archetype-shared/components/AppLoader.vue'
 import ThemeSwitcher from '@apotome/archetype-shared/components/ThemeSwitcher.vue'
 
 const { initFromConfig } = useSiteTheme()
+
+/* Title, description, social cards, favicon and LocalBusiness data follow the
+   owner's content (brand, tagline, blurb, contact, hero photo) and change per
+   page; dashboard, checkout and order pages stay out of search. */
+useSiteSeo({
+  site: siteConfig,
+  archetype: 'utility',
+  page: (route) => {
+    const s = siteConfig.sections
+    switch (route.name) {
+      case 'services': return { title: s.servicesPage.title, description: s.servicesPage.subtitle }
+      case 'projects': return { title: s.projectsPage.title, description: s.projectsPage.subtitle }
+      case 'contact': return { title: s.contactPage.title, description: s.contactPage.subtitle }
+      default: return null
+    }
+  },
+})
 const { isReady, progress, loaded, total, label, preloadCritical } = useImagePreload()
 
 onMounted(async () => {
